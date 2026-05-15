@@ -1,0 +1,66 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner() {
+      return existing().ownerId == request.auth.uid;
+    }
+    
+    function isValidVideo(data) {
+      return data.keys().hasAll(['title', 'thumbnail', 'videoUrl', 'channel', 'views', 'createdAt', 'updatedAt', 'ownerId']) &&
+             data.keys().size() == 8 &&
+             data.title is string && data.title.size() > 0 && data.title.size() <= 200 &&
+             data.thumbnail is string && data.thumbnail.size() > 0 && data.thumbnail.size() <= 1000 &&
+             data.videoUrl is string && data.videoUrl.size() > 0 && data.videoUrl.size() <= 2000 &&
+             data.channel is string && data.channel.size() > 0 && data.channel.size() <= 100 &&
+             data.views is number &&
+             data.ownerId == request.auth.uid &&
+             data.createdAt is timestamp &&
+             data.updatedAt is timestamp;
+    }
+
+    match /videos/{videoId} {
+      allow read: if true; // anyone can read videos to see the public feed
+      
+      allow create: if isSignedIn() &&
+                    isValidId(videoId) &&
+                    isValidVideo(incoming()) &&
+                    incoming().createdAt == request.time &&
+                    incoming().updatedAt == request.time &&
+                    incoming().views == 0;
+                    
+      allow update: if isSignedIn() &&
+                    isOwner() &&
+                    incoming().diff(existing()).affectedKeys().hasOnly(['title', 'thumbnail', 'videoUrl', 'updatedAt', 'views']) &&
+                    incoming().updatedAt == request.time &&
+                    incoming().views >= existing().views &&
+                    (
+                      (!('title' in incoming().diff(existing()).affectedKeys()) || (incoming().title is string && incoming().title.size() > 0 && incoming().title.size() <= 200)) &&
+                      (!('thumbnail' in incoming().diff(existing()).affectedKeys()) || (incoming().thumbnail is string && incoming().thumbnail.size() > 0 && incoming().thumbnail.size() <= 1000)) &&
+                      (!('videoUrl' in incoming().diff(existing()).affectedKeys()) || (incoming().videoUrl is string && incoming().videoUrl.size() > 0 && incoming().videoUrl.size() <= 2000))
+                    );
+
+      allow delete: if isSignedIn() && isOwner();
+    }
+  }
+}

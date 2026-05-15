@@ -1,0 +1,26 @@
+{
+  "entities": {
+    "Video": {
+      "title": "Video",
+      "description": "A YouTube-style video metadata object",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "thumbnail": { "type": "string" },
+        "videoUrl": { "type": "string" },
+        "channel": { "type": "string" },
+        "views": { "type": "number", "description": "Number of views" },
+        "createdAt": { "type": "number", "description": "Creation timestamp in millis as stored by Firestore" },
+        "updatedAt": { "type": "number", "description": "Update timestamp in millis" },
+        "ownerId": { "type": "string" }
+      },
+      "required": ["title", "thumbnail", "videoUrl", "channel", "views", "createdAt", "updatedAt", "ownerId"]
+    }
+  },
+  "firestore": {
+    "/videos/{videoId}": {
+      "schema": { "$ref": "#/entities/Video" },
+      "description": "Stores user-uploaded videos"
+    }
+  }
+}
