@@ -5,15 +5,13 @@
 
 import { useState, useEffect } from 'react';
 import { Header } from './components/Header';
-import { Sidebar } from './components/Sidebar';
 import { VideoCard } from './components/VideoCard';
-import { FilterBar } from './components/FilterBar';
 import { WatchView } from './components/WatchView';
 import { UploadModal } from './components/UploadModal';
-import { db, auth, signIn, logOut } from './lib/firebase';
-import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
-import { onAuthStateChanged, User } from 'firebase/auth';
-import { handleFirestoreError, OperationType } from './lib/error';
+import { AuthModal } from './components/AuthModal';
+import { CreateChannelModal } from './components/CreateChannelModal';
+import { ChannelView } from './components/ChannelView';
+import { supabase } from './lib/supabase';
 
 interface VideoData {
   id: string;
@@ -26,121 +24,131 @@ interface VideoData {
 }
 
 export default function App() {
-  const [view, setView] = useState<'home' | 'watch'>('home');
+  const [view, setView] = useState<'home' | 'watch' | 'channel'>('home');
   const [selectedVideo, setSelectedVideo] = useState<VideoData | null>(null);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isCreateChannelOpen, setIsCreateChannelOpen] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [userChannel, setUserChannel] = useState<any>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   
   const [videos, setVideos] = useState<VideoData[]>([]);
 
   useEffect(() => {
-    const unsubAuth = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
     });
 
-    const valQuery = query(collection(db, 'videos'), orderBy('createdAt', 'desc'));
-    const unsubVideos = onSnapshot(valQuery, (snapshot) => {
-      const vids: VideoData[] = [];
-      snapshot.forEach((doc) => {
-        const data = doc.data();
-        let timeStr = 'Just now';
-        
-        if (data.createdAt) {
-          const secondsDiff = Math.floor((Date.now() - (data.createdAt?.toMillis ? data.createdAt.toMillis() : data.createdAt)) / 1000);
-          if (secondsDiff < 60) timeStr = `${secondsDiff} seconds ago`;
-          else if (secondsDiff < 3600) timeStr = `${Math.floor(secondsDiff / 60)} minutes ago`;
-          else if (secondsDiff < 86400) timeStr = `${Math.floor(secondsDiff / 3600)} hours ago`;
-          else timeStr = `${Math.floor(secondsDiff / 86400)} days ago`;
-        }
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+    
+    const fetchVideos = async () => {
+      const { data, error } = await supabase
+        .from('videos')
+        .select('*')
+        .order('createdAt', { ascending: false });
 
-        vids.push({
-          id: doc.id,
-          thumbnail: data.thumbnail,
-          videoUrl: data.videoUrl,
-          title: data.title,
-          channel: data.channel,
-          views: data.views,
-          time: timeStr,
-        });
-      });
-      if (vids.length === 0) {
-        setVideos([
-          {
-            id: 'mock1',
-            thumbnail: 'https://picsum.photos/seed/1/320/180',
-            title: 'Sample Video - Big Buck Bunny',
-            channel: 'Blender Foundation',
-            views: 1000000,
-            time: '10 years ago',
-            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
-          },
-          {
-            id: 'mock2',
-            thumbnail: 'https://picsum.photos/seed/2/320/180',
-            title: 'Elephant Dream',
-            channel: 'Blender Foundation',
-            views: 500000,
-            time: '5 years ago',
-            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4'
-          },
-          {
-            id: 'mock3',
-            thumbnail: 'https://picsum.photos/seed/3/320/180',
-            title: 'For Bigger Blazes',
-            channel: 'Google',
-            views: 200000,
-            time: '2 years ago',
-            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4'
-          },
-          {
-            id: 'mock4',
-            thumbnail: 'https://picsum.photos/seed/4/320/180',
-            title: 'For Bigger Joyrides',
-            channel: 'Google',
-            views: 150000,
-            time: '1 year ago',
-            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4'
+      if (!error && data) {
+        const vids: VideoData[] = data.map((doc: any) => {
+          let timeStr = 'Just now';
+          
+          if (doc.createdAt) {
+            const secondsDiff = Math.floor((Date.now() - new Date(doc.createdAt).getTime()) / 1000);
+            if (secondsDiff < 60) timeStr = `${secondsDiff} seconds ago`;
+            else if (secondsDiff < 3600) timeStr = `${Math.floor(secondsDiff / 60)} minutes ago`;
+            else if (secondsDiff < 86400) timeStr = `${Math.floor(secondsDiff / 3600)} hours ago`;
+            else timeStr = `${Math.floor(secondsDiff / 86400)} days ago`;
           }
-        ]);
-      } else {
+
+          return {
+            id: doc.id,
+            thumbnail: doc.thumbnail,
+            videoUrl: doc.videoUrl,
+            title: doc.title,
+            channel: doc.channel,
+            views: doc.views,
+            time: timeStr,
+          };
+        });
+
         setVideos(vids);
+      } else {
+        setVideos([]);
       }
-    }, (error) => {
-      handleFirestoreError(error, OperationType.LIST, 'videos');
-    });
+    };
+    
+    fetchVideos();
+
+    const videoSubscription = supabase.channel('public:videos')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'videos' }, payload => {
+        fetchVideos();
+      })
+      .subscribe();
 
     return () => {
-      unsubAuth();
-      unsubVideos();
+      subscription?.unsubscribe();
+      supabase.removeChannel(videoSubscription);
     };
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      supabase.from('channels').select('*').eq('id', user.id).single().then(({ data }) => {
+        setUserChannel(data);
+      });
+    } else {
+      setUserChannel(null);
+    }
+  }, [user]);
+
+  const handleSignIn = async () => {
+    setIsAuthModalOpen(true);
+  };
+  const handleMyChannelClick = () => {
+    if (!user) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+    if (userChannel) {
+      setView('channel');
+    } else {
+      setIsCreateChannelOpen(true);
+    }
+  };
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+  };
 
   return (
     <div className="flex flex-col h-screen">
       <Header 
         onUploadClick={() => {
           if (!user) {
-            signIn();
+            handleSignIn();
           } else {
             setIsUploadModalOpen(true);
           }
         }} 
         user={user}
-        onSignIn={signIn}
-        onSignOut={logOut}
+        onSignIn={handleSignIn}
+        onSignOut={handleSignOut}
         onHomeClick={() => setView('home')}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
       />
       <div className="flex flex-1 overflow-hidden">
-        <Sidebar onHomeClick={() => setView('home')} currentView={view} />
         <main className="flex-1 overflow-y-auto p-4">
           {view === 'home' ? (
             <>
-              <FilterBar />
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-4">
-                {videos.map((video) => (
+                {videos.filter(v => v.title.toLowerCase().includes(searchQuery.toLowerCase()) || v.channel.toLowerCase().includes(searchQuery.toLowerCase())).map((video) => (
                   <VideoCard 
                     key={video.id}
                     thumbnail={video.thumbnail}
+                    videoUrl={video.videoUrl}
                     title={video.title}
                     channel={video.channel}
                     views={`${video.views} views`}
@@ -153,8 +161,22 @@ export default function App() {
                 ))}
               </div>
             </>
+          ) : view === 'channel' ? (
+            <ChannelView 
+              channel={userChannel} 
+              onVideoClick={(video) => {
+                setSelectedVideo(video);
+                setView('watch');
+              }} 
+            />
           ) : (
-            <WatchView video={selectedVideo} />
+            <WatchView 
+              video={videos.find(v => v.id === selectedVideo?.id) || selectedVideo} 
+              user={user} 
+              onClose={() => setView('home')} 
+              relatedVideos={videos}
+              onVideoClick={(video) => setSelectedVideo(video)}
+            />
           )}
         </main>
       </div>
@@ -162,8 +184,22 @@ export default function App() {
         <UploadModal 
           isOpen={isUploadModalOpen} 
           onClose={() => setIsUploadModalOpen(false)} 
+          userChannel={userChannel}
         />
       )}
+      <AuthModal 
+        isOpen={isAuthModalOpen} 
+        onClose={() => setIsAuthModalOpen(false)} 
+      />
+      <CreateChannelModal
+        isOpen={isCreateChannelOpen}
+        onClose={() => setIsCreateChannelOpen(false)}
+        user={user}
+        onChannelCreated={(channel) => {
+          setUserChannel(channel);
+          setView('channel');
+        }}
+      />
     </div>
   );
 }

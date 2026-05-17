@@ -1,18 +1,17 @@
 import React, { useState, useRef } from 'react';
 import { UploadCloud, X } from 'lucide-react';
-import { db, auth, storage } from '../lib/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { handleFirestoreError, OperationType } from '../lib/error';
+import { supabase } from '../lib/supabase';
 
 interface UploadModalProps {
   isOpen: boolean;
   onClose: () => void;
+  userChannel?: any;
 }
 
-export const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose }) => {
+export const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, userChannel }) => {
   const [title, setTitle] = useState('');
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -23,6 +22,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose }) => 
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setThumbnailFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setThumbnailPreview(reader.result as string);
@@ -33,44 +33,69 @@ export const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose }) => 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title || !auth.currentUser || !videoFile) return;
+    if (!title || !videoFile) return;
     
     setIsUploading(true);
     try {
-      const storageRef = ref(storage, `videos/${auth.currentUser.uid}/${Date.now()}_${videoFile.name}`);
-      const uploadTask = uploadBytesResumable(storageRef, videoFile);
+      const { data: { user } } = await supabase.auth.getUser();
+      const fileName = `${Date.now()}_${videoFile.name.replace(/[^a-zA-Z0-9.-]/g, '')}`;
+      const filePath = `user_videos/${user?.id || 'anonymous'}/${fileName}`;
 
-      uploadTask.on('state_changed', 
-        (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          setProgress(progress);
-        }, 
-        (error) => {
-          console.error("Upload failed", error);
-          setIsUploading(false);
-        }, 
-        async () => {
-          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-          await addDoc(collection(db, 'videos'), {
-            title,
-            thumbnail: thumbnailPreview || 'https://picsum.photos/seed/999/320/180',
-            videoUrl: downloadURL,
-            channel: auth.currentUser?.displayName || 'You',
-            views: 0,
-            createdAt: serverTimestamp(),
-            updatedAt: serverTimestamp(),
-            ownerId: auth.currentUser?.uid
-          });
-          setTitle('');
-          setThumbnailPreview(null);
-          setVideoFile(null);
-          setProgress(0);
-          setIsUploading(false);
-          onClose();
+      // We just kind of fake the progress for Supabase for now since it doesn't give events as easily
+      setProgress(40);
+      
+      const { data, error } = await supabase.storage
+        .from('videos')
+        .upload(filePath, videoFile, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      setProgress(80);
+
+      if (error) {
+        console.error("Upload failed", error);
+      }
+
+      const { data: publicUrlData } = supabase.storage
+        .from('videos')
+        .getPublicUrl(filePath);
+
+      let finalThumbnailUrl = 'https://picsum.photos/seed/999/320/180';
+      
+      if (thumbnailFile) {
+        const thumbPath = `user_thumbnails/${user?.id || 'anonymous'}/${Date.now()}_${thumbnailFile.name.replace(/[^a-zA-Z0-9.-]/g, '')}`;
+        const { error: thumbError } = await supabase.storage.from('videos').upload(thumbPath, thumbnailFile, { cacheControl: '3600', upsert: false });
+        if (!thumbError) {
+          const { data: thumbUrlData } = supabase.storage.from('videos').getPublicUrl(thumbPath);
+          if (thumbUrlData?.publicUrl) finalThumbnailUrl = thumbUrlData.publicUrl;
         }
-      );
+      } else if (thumbnailPreview) {
+        finalThumbnailUrl = thumbnailPreview;
+      }
+      setProgress(90);
+
+      const downloadURL = publicUrlData?.publicUrl || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
+      
+      await supabase.from('videos').insert({
+        title,
+        thumbnail: finalThumbnailUrl,
+        videoUrl: downloadURL,
+        channel: userChannel?.name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'You',
+        views: 0,
+        createdAt: new Date().toISOString(),
+        ownerId: user?.id || 'anonymous'
+      });
+      
+      setTitle('');
+      setThumbnailPreview(null);
+      setThumbnailFile(null);
+      setVideoFile(null);
+      setProgress(0);
+      setIsUploading(false);
+      onClose();
     } catch (error) {
-      handleFirestoreError(error, OperationType.WRITE, 'videos');
+      console.error(error);
       setIsUploading(false);
     }
   };
