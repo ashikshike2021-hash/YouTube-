@@ -103,10 +103,10 @@ export const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, userC
 
   return (
     <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl flex flex-col max-h-[90vh]">
-        <div className="flex items-center justify-between p-4 border-b">
+      <div className="bg-[#121212] border border-[#333333] rounded-xl shadow-xl w-full max-w-2xl flex flex-col max-h-[90vh] text-white">
+        <div className="flex items-center justify-between p-4 border-b border-[#333333]">
           <h2 className="text-xl font-semibold">Upload Video</h2>
-          <button onClick={onClose} disabled={isUploading} className="p-2 hover:bg-gray-100 rounded-full disabled:opacity-50">
+          <button onClick={onClose} disabled={isUploading} className="p-2 hover:bg-[#333333] rounded-full disabled:opacity-50">
             <X size={24} />
           </button>
         </div>
@@ -126,31 +126,31 @@ export const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, userC
                 }
               }}
             />
-            <div className="border-2 border-dashed border-gray-300 rounded-xl p-12 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-gray-50 transition-colors"
+            <div className="border-2 border-dashed border-[#333333] rounded-xl p-12 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-[#1a1a1a] transition-colors"
               onClick={() => !isUploading && fileInputRef.current?.click()}
             >
-              <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                <UploadCloud size={32} className="text-gray-500" />
+              <div className="w-20 h-20 bg-[#1a1a1a] rounded-full flex items-center justify-center mb-4">
+                <UploadCloud size={32} className="text-gray-400" />
               </div>
               <p className="text-lg font-medium mb-1">{videoFile ? videoFile.name : 'Select video files to upload'}</p>
-              <p className="text-sm text-gray-500 mb-4">Your videos will be private until you publish them.</p>
+              <p className="text-sm text-gray-400 mb-4">Your videos will be private until you publish them.</p>
               {!videoFile && <button type="button" className="bg-blue-600 text-white px-4 py-2 rounded-md font-medium">SELECT FILES</button>}
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Title (required)</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Title (required)</label>
               <input 
                 type="text" 
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Add a title that describes your video" 
-                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-[#333333] bg-[#1a1a1a] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Thumbnail</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Thumbnail</label>
               <div className="flex items-center gap-4">
                 <input 
                   type="file" 
@@ -161,7 +161,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, userC
                 />
                 <label 
                   htmlFor="thumbnail-upload"
-                  className="px-4 py-2 border rounded-md hover:bg-gray-50 cursor-pointer text-sm"
+                  className="px-4 py-2 border border-[#333333] rounded-md hover:bg-[#1a1a1a] cursor-pointer text-sm"
                 >
                   Upload image
                 </label>
@@ -172,19 +172,19 @@ export const UploadModal: React.FC<UploadModalProps> = ({ isOpen, onClose, userC
             </div>
           </div>
           
-          <div className="mt-8 flex justify-end gap-3 pt-4 border-t items-center">
+          <div className="mt-8 flex justify-end gap-3 pt-4 border-t border-[#333333] items-center">
             {isUploading && (
               <div className="flex-1 mr-4">
-                <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+                <div className="h-2 w-full bg-[#333333] rounded-full overflow-hidden">
                   <div className="h-full bg-blue-600 transition-all duration-300" style={{ width: `${progress}%` }}></div>
                 </div>
-                <p className="text-xs text-gray-500 mt-1">{Math.round(progress)}% uploaded</p>
+                <p className="text-xs text-gray-400 mt-1">{Math.round(progress)}% uploaded</p>
               </div>
             )}
-            <button type="button" onClick={onClose} disabled={isUploading} className="px-4 py-2 text-sm font-medium hover:bg-gray-100 rounded-md disabled:opacity-50">Cancel</button>
+            <button type="button" onClick={onClose} disabled={isUploading} className="px-4 py-2 text-sm font-medium hover:bg-[#333333] rounded-md disabled:opacity-50">Cancel</button>
             <button 
               type="submit" 
-              className={`px-4 py-2 text-sm font-medium rounded-md text-white ${title && videoFile && !isUploading ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'}`}
+              className={`px-4 py-2 text-sm font-medium rounded-md text-white ${title && videoFile && !isUploading ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-600 cursor-not-allowed'}`}
               disabled={!title || !videoFile || isUploading}
             >
               {isUploading ? 'Uploading...' : 'Upload'}

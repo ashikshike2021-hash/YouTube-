@@ -47,30 +47,30 @@ export const CreateChannelModal: React.FC<CreateChannelModalProps> = ({ isOpen, 
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl w-full max-w-md p-8 relative shadow-2xl">
-        <button onClick={onClose} className="absolute top-5 right-5 p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors">
-          <X size={20} className="text-gray-600" />
+      <div className="bg-[#121212] rounded-3xl w-full max-w-md p-8 relative shadow-2xl border border-[#333333]">
+        <button onClick={onClose} className="absolute top-5 right-5 p-2 bg-[#1a1a1a] hover:bg-[#333333] rounded-full transition-colors">
+          <X size={20} className="text-gray-400" />
         </button>
-        <h2 className="text-2xl font-bold mb-6 text-gray-900 tracking-tight">Create Channel</h2>
+        <h2 className="text-2xl font-bold mb-6 text-white tracking-tight">Create Channel</h2>
         
-        {error && <div className="bg-red-50 text-red-600 p-3 rounded-xl mb-5 text-sm font-medium border border-red-100">{error}</div>}
+        {error && <div className="bg-red-900/30 text-red-400 p-3 rounded-xl mb-5 text-sm font-medium border border-red-800/50">{error}</div>}
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5 ml-1">Channel Name</label>
+            <label className="block text-sm font-semibold text-gray-300 mb-1.5 ml-1">Channel Name</label>
             <input
               type="text"
               required
-              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all font-medium"
+              className="w-full px-4 py-3 bg-[#1a1a1a] border border-[#333333] rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all font-medium text-white"
               placeholder="e.g. My Awesome Channel"
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5 ml-1">Description (Optional)</label>
+            <label className="block text-sm font-semibold text-gray-300 mb-1.5 ml-1">Description (Optional)</label>
             <textarea
-              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all font-medium"
+              className="w-full px-4 py-3 bg-[#1a1a1a] border border-[#333333] rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all font-medium text-white"
               placeholder="Tell viewers about your channel..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}

@@ -4,9 +4,9 @@
 @theme {
   --font-sans: 'Montserrat', ui-sans-serif, system-ui, sans-serif;
   --color-yt-red: #FF0000;
-  --color-yt-bg: #F2F2F2;
-  --color-yt-border: #E5E5E5;
-  --color-yt-text: #282828;
+  --color-yt-bg: #000000;
+  --color-yt-border: #333333;
+  --color-yt-text: #FFFFFF;
 }
 
 body {

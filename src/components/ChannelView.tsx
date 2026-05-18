@@ -43,22 +43,22 @@ export const ChannelView = ({ channel, onVideoClick }: { channel: any, onVideoCl
   }, [channel?.id]);
 
   return (
-    <div className="p-8 w-full max-w-7xl mx-auto">
-      <div className="flex items-center gap-6 mb-12 border-b border-gray-200 pb-8">
+    <div className="p-8 w-full max-w-7xl mx-auto text-white">
+      <div className="flex items-center gap-6 mb-12 border-b border-[#333333] pb-8">
         <div className="w-24 h-24 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center text-4xl font-bold shadow-lg">
           {channel?.name?.charAt(0)?.toUpperCase()}
         </div>
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">{channel?.name}</h1>
-          {channel?.description && <p className="text-gray-600">{channel.description}</p>}
-          <p className="text-gray-500 mt-2 text-sm font-medium">{videos.length} videos</p>
+          <h1 className="text-3xl font-bold text-white mb-2">{channel?.name}</h1>
+          {channel?.description && <p className="text-gray-400">{channel.description}</p>}
+          <p className="text-gray-400 mt-2 text-sm font-medium">{videos.length} videos</p>
         </div>
       </div>
       
       <h3 className="text-xl font-bold mb-6">Videos</h3>
       
       {videos.length === 0 ? (
-        <div className="text-center text-gray-500 py-12">
+        <div className="text-center text-gray-400 py-12">
           This channel hasn't uploaded any videos yet.
         </div>
       ) : (

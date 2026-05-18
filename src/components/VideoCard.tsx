@@ -46,20 +46,20 @@ export const VideoCard: React.FC<VideoCardProps> = ({ thumbnail, title, channel,
 
   return (
     <div className="flex flex-col gap-3 cursor-pointer group" onClick={onClick}>
-      <div className="aspect-video bg-gray-200 rounded-2xl overflow-hidden relative border border-gray-100">
+      <div className="aspect-video bg-gray-800 rounded-2xl overflow-hidden relative border border-[#333333]">
         <img src={thumbnail} alt={title} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
         <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs font-medium px-1.5 py-0.5 rounded">
           {realDuration || duration || getDurationBasedOnTitle(title)}
         </div>
       </div>
       <div className="flex gap-3 px-1">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-gray-200 to-gray-300 shrink-0 flex items-center justify-center text-gray-500 font-bold uppercase text-lg border border-gray-200 shadow-sm mt-1">
+        <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-gray-800 to-gray-700 shrink-0 flex items-center justify-center text-gray-400 font-bold uppercase text-lg border border-[#333333] shadow-sm mt-1">
           {channel.charAt(0)}
         </div>
         <div className="flex flex-col">
-          <h3 className="font-semibold text-[15px] leading-tight line-clamp-2 text-gray-900 group-hover:text-red-600 transition-colors">{title}</h3>
-          <p className="text-[13px] text-gray-500 mt-1 font-medium">{channel}</p>
-          <p className="text-[13px] text-gray-500 font-medium">{views} · {time}</p>
+          <h3 className="font-semibold text-[15px] leading-tight line-clamp-2 text-gray-100 group-hover:text-red-500 transition-colors">{title}</h3>
+          <p className="text-[13px] text-gray-400 mt-1 font-medium">{channel}</p>
+          <p className="text-[13px] text-gray-400 font-medium">{views} · {time}</p>
         </div>
       </div>
     </div>

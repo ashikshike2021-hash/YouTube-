@@ -54,24 +54,24 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl w-full max-w-md p-8 relative shadow-2xl">
-        <button onClick={onClose} className="absolute top-5 right-5 p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors">
-          <X size={20} className="text-gray-600" />
+      <div className="bg-[#121212] border border-[#333333] rounded-3xl w-full max-w-md p-8 relative shadow-2xl">
+        <button onClick={onClose} className="absolute top-5 right-5 p-2 bg-[#1a1a1a] hover:bg-[#333333] rounded-full transition-colors">
+          <X size={20} className="text-gray-400" />
         </button>
-        <h2 className="text-2xl font-bold mb-6 text-gray-900 tracking-tight">{isLogin ? 'Welcome Back' : 'Create an Account'}</h2>
+        <h2 className="text-2xl font-bold mb-6 text-white tracking-tight">{isLogin ? 'Welcome Back' : 'Create an Account'}</h2>
         
-        {error && <div className="bg-red-50 text-red-600 p-3 rounded-xl mb-5 text-sm font-medium border border-red-100">{error}</div>}
-        {message && <div className="bg-green-50 text-green-700 p-3 rounded-xl mb-5 text-sm font-medium border border-green-100">{message}</div>}
+        {error && <div className="bg-red-900/30 text-red-400 p-3 rounded-xl mb-5 text-sm font-medium border border-red-800/50">{error}</div>}
+        {message && <div className="bg-green-900/30 text-green-400 p-3 rounded-xl mb-5 text-sm font-medium border border-green-800/50">{message}</div>}
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5 ml-1">Email Address</label>
+            <label className="block text-sm font-semibold text-gray-300 mb-1.5 ml-1">Email Address</label>
             <div className="relative">
               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
               <input
                 type="email"
                 required
-                className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all font-medium"
+                className="w-full pl-11 pr-4 py-3 bg-[#1a1a1a] border border-[#333333] rounded-xl focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all font-medium text-white"
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -79,13 +79,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5 ml-1">Password</label>
+            <label className="block text-sm font-semibold text-gray-300 mb-1.5 ml-1">Password</label>
             <div className="relative">
               <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
               <input
                 type="password"
                 required
-                className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all font-medium"
+                className="w-full pl-11 pr-4 py-3 bg-[#1a1a1a] border border-[#333333] rounded-xl focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all font-medium text-white"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -101,7 +101,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           </button>
         </form>
         
-        <div className="mt-8 text-center text-[15px] text-gray-600 font-medium">
+        <div className="mt-8 text-center text-[15px] text-gray-400 font-medium">
           {isLogin ? "Don't have an account? " : "Already have an account? "}
           <button 
             type="button"

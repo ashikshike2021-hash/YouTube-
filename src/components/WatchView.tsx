@@ -103,7 +103,7 @@ export const WatchView = ({ video, user, onClose, relatedVideos = [], onVideoCli
       {onClose && (
         <button 
           onClick={onClose}
-          className="mb-4 inline-flex items-center gap-2 p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors"
+          className="mb-4 inline-flex items-center gap-2 p-2 bg-[#1a1a1a] hover:bg-[#333333] rounded-full transition-colors text-white"
         >
           <ArrowLeft size={20} />
           <span className="font-medium text-sm pr-2">Back</span>
@@ -119,47 +119,47 @@ export const WatchView = ({ video, user, onClose, relatedVideos = [], onVideoCli
         />
       </div>
       
-      <h1 className="text-[22px] font-bold mt-5 text-gray-900 leading-tight">{video?.title || 'Video Title Here'}</h1>
+      <h1 className="text-[22px] font-bold mt-5 text-white leading-tight">{video?.title || 'Video Title Here'}</h1>
       
-      <div className="flex flex-wrap items-center gap-4 mt-3 pb-6 border-b border-gray-200">
+      <div className="flex flex-wrap items-center gap-4 mt-3 pb-6 border-b border-[#333333]">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-full flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-bold tracking-widest text-lg shadow-md cursor-pointer hover:opacity-80">
             {video?.channel?.charAt(0)?.toUpperCase() || 'C'}
           </div>
-          <div className="cursor-pointer hover:underline cursor-pointer">
-            <h3 className="font-bold text-[15px]">{video?.channel || 'Channel Name'}</h3>
-            <p className="text-[13px] text-gray-500">Subscribers</p>
+          <div className="cursor-pointer hover:underline">
+            <h3 className="font-bold text-[15px] text-white">{video?.channel || 'Channel Name'}</h3>
+            <p className="text-[13px] text-gray-400">Subscribers</p>
           </div>
         </div>
         
-        <button className="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-full font-semibold ml-2 transition-colors duration-200 shadow-sm text-[14px]">
+        <button className="bg-white text-black hover:bg-gray-200 px-5 py-2.5 rounded-full font-semibold ml-2 transition-colors duration-200 shadow-sm text-[14px]">
           Subscribe
         </button>
         
-        <div className="flex items-center gap-2 ml-auto">
-          <div className="flex bg-gray-100 rounded-full items-center">
-            <button onClick={handleToggleLike} className={`flex items-center gap-2 px-4 py-2 hover:bg-gray-200 rounded-l-full transition-colors text-[14px] font-medium border-r border-gray-300 ${hasLiked ? 'text-blue-600' : ''}`}>
+        <div className="flex items-center gap-2 ml-auto text-white">
+          <div className="flex bg-[#1a1a1a] rounded-full items-center">
+            <button onClick={handleToggleLike} className={`flex items-center gap-2 px-4 py-2 hover:bg-[#333333] rounded-l-full transition-colors text-[14px] font-medium border-r border-[#333333] ${hasLiked ? 'text-blue-400' : ''}`}>
               <ThumbsUp size={18} fill={hasLiked ? 'currentColor' : 'none'} />
               {likesCount > 0 ? likesCount : 'Like'}
             </button>
-            <button className="px-4 py-2 hover:bg-gray-200 rounded-r-full transition-colors">
+            <button className="px-4 py-2 hover:bg-[#333333] rounded-r-full transition-colors">
               <ThumbsDown size={18} />
             </button>
           </div>
-          <button className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-full transition-colors text-[14px] font-medium">
+          <button className="flex items-center gap-2 bg-[#1a1a1a] hover:bg-[#333333] px-4 py-2 rounded-full transition-colors text-[14px] font-medium">
             <Share2 size={18} /> Share
           </button>
-          <button className="bg-gray-100 hover:bg-gray-200 p-2.5 rounded-full transition-colors">
+          <button className="bg-[#1a1a1a] hover:bg-[#333333] p-2.5 rounded-full transition-colors">
             <MoreHorizontal size={18} />
           </button>
         </div>
       </div>
       
-      <div className="bg-gray-100 rounded-2xl p-4 mt-6 text-[14px]">
+      <div className="bg-[#1a1a1a] rounded-2xl p-4 mt-6 text-[14px] text-white">
         <p className="font-semibold mb-1">{video?.views || 0} views</p>
       </div>
 
-      <div className="mt-8">
+      <div className="mt-8 text-white">
         <h3 className="text-xl font-bold mb-4">{comments.length} Comments</h3>
         
         {user ? (
@@ -171,35 +171,35 @@ export const WatchView = ({ video, user, onClose, relatedVideos = [], onVideoCli
               <input 
                 type="text" 
                 placeholder="Add a comment..." 
-                className="w-full border-b border-gray-300 focus:border-black outline-none py-1 bg-transparent"
+                className="w-full border-b border-[#333333] focus:border-white outline-none py-1 bg-transparent text-white"
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
               />
               {newComment && (
                 <div className="flex justify-end gap-2 mt-2">
-                  <button type="button" onClick={() => setNewComment('')} className="px-4 py-2 hover:bg-gray-100 rounded-full font-medium">Cancel</button>
+                  <button type="button" onClick={() => setNewComment('')} className="px-4 py-2 hover:bg-gray-800 rounded-full font-medium">Cancel</button>
                   <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-full font-medium">Comment</button>
                 </div>
               )}
             </div>
           </form>
         ) : (
-          <p className="text-sm text-gray-500 mb-8">Sign in to add a comment.</p>
+          <p className="text-sm text-gray-400 mb-8">Sign in to add a comment.</p>
         )}
 
         <div className="flex flex-col gap-6">
           {comments.map((comment) => (
             <div key={comment.id} className="flex gap-4">
-              <div className="w-10 h-10 rounded-full bg-gray-300 text-gray-700 flex items-center justify-center font-bold shrink-0 uppercase">
+              <div className="w-10 h-10 rounded-full bg-gray-800 text-gray-300 flex items-center justify-center font-bold shrink-0 uppercase">
                 {(comment.user_name || 'U').charAt(0)}
               </div>
               <div>
                 <p className="text-[13px] font-semibold mb-1">
-                  {comment.user_name} <span className="text-gray-500 font-normal ml-1">
+                  {comment.user_name} <span className="text-gray-400 font-normal ml-1">
                     {new Date(comment.created_at).toLocaleDateString()}
                   </span>
                 </p>
-                <p className="text-[14px] text-gray-800">{comment.text}</p>
+                <p className="text-[14px] text-gray-200">{comment.text}</p>
               </div>
             </div>
           ))}
@@ -207,7 +207,7 @@ export const WatchView = ({ video, user, onClose, relatedVideos = [], onVideoCli
       </div>
     </div>
 
-    <div className="flex-1 flex flex-col gap-4 mt-8 lg:mt-0">
+    <div className="flex-1 flex flex-col gap-4 mt-8 lg:mt-0 text-white">
       <h3 className="font-bold text-lg mb-2">Related Videos</h3>
       <div className="flex flex-col gap-4">
         {relatedVideos.filter(v => v.id !== video?.id).map((v) => (
