@@ -1,6 +1,6 @@
 {
-  "name": "YouTube Clone",
-  "description": "A responsive layout mimicking the YouTube homepage interface.",
+  "name": "NeoTube",
+  "description": "A video sharing platform mimicking the YouTube homepage interface.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
